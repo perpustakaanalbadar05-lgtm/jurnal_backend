@@ -13,16 +13,23 @@ class SystemController extends Controller
 
     public function getSettings()
     {
+        $defaultSettings = [
+            'university_name' => 'Universitas Teknologi Jurnal',
+            'description' => 'Sistem Manajemen Publikasi Akademik Resmi',
+            'contact_email' => 'admin@kampus.ac.id',
+            'address' => 'Jl. Pendidikan No. 1, Kota Akademik',
+            'categories' => ['Computer Science', 'Information Systems', 'Software Engineering', 'Artificial Intelligence', 'Networking', 'Others'],
+        ];
+
         if (!Storage::disk('local')->exists($this->settingsFile)) {
-            return response()->json([
-                'university_name' => 'Universitas Teknologi Jurnal',
-                'description' => 'Sistem Manajemen Publikasi Akademik Resmi',
-                'contact_email' => 'admin@kampus.ac.id',
-                'address' => 'Jl. Pendidikan No. 1, Kota Akademik',
-            ]);
+            return response()->json($defaultSettings);
         }
 
         $settings = json_decode(Storage::disk('local')->get($this->settingsFile), true);
+        
+        // Merge with defaults to ensure missing fields (like categories) are populated
+        $settings = array_merge($defaultSettings, $settings);
+        
         return response()->json($settings);
     }
 
@@ -33,9 +40,11 @@ class SystemController extends Controller
             'description' => 'nullable|string',
             'contact_email' => 'required|email',
             'address' => 'nullable|string',
+            'categories' => 'nullable|array',
+            'categories.*' => 'required|string|max:255',
         ]);
 
-        $settings = $request->only(['university_name', 'description', 'contact_email', 'address']);
+        $settings = $request->only(['university_name', 'description', 'contact_email', 'address', 'categories']);
         
         Storage::disk('local')->put($this->settingsFile, json_encode($settings, JSON_PRETTY_PRINT));
 
