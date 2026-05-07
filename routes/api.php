@@ -64,6 +64,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     // Reviews
     Route::get('/papers/{paper}/reviews', [ReviewController::class, 'index']);
+    Route::get('/reviews/{review}/download', [ReviewController::class, 'download']);
     Route::post('/reviews', [ReviewController::class, 'store'])
         ->middleware('role:reviewer,admin,super_admin');
     Route::put('/reviews/{review}', [ReviewController::class, 'update'])

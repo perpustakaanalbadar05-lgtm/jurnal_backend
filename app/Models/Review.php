@@ -10,7 +10,7 @@ class Review extends Model
     use HasFactory;
 
     protected $fillable = [
-        'paper_id', 'reviewer_id', 'comment', 'private_comment', 'decision', 'status',
+        'paper_id', 'reviewer_id', 'comment', 'private_comment', 'decision', 'status', 'file_path', 'file_name',
     ];
 
     const DECISION_ACCEPT = 'accept';

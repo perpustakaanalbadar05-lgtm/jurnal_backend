@@ -42,6 +42,7 @@ class ReviewController extends Controller
             'comment' => 'required|string',
             'private_comment' => 'nullable|string',
             'decision' => 'required|in:accept,minor_revision,major_revision,reject',
+            'file' => 'nullable|file|mimes:pdf,doc,docx|max:20480',
         ]);
 
         $paper = Paper::findOrFail($request->paper_id);
@@ -52,6 +53,14 @@ class ReviewController extends Controller
             return response()->json(['message' => 'You are not assigned to review this paper.'], 403);
         }
 
+        $filePath = null;
+        $fileName = null;
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $fileName = $file->getClientOriginalName();
+            $filePath = $file->store('reviews', 'local');
+        }
+
         $review = Review::create([
             'paper_id' => $request->paper_id,
             'reviewer_id' => $user->id,
@@ -59,6 +68,8 @@ class ReviewController extends Controller
             'private_comment' => $request->private_comment,
             'decision' => $request->decision,
             'status' => 'completed',
+            'file_path' => $filePath,
+            'file_name' => $fileName,
         ]);
 
         // Auto-update paper status based on decision
@@ -113,5 +124,28 @@ class ReviewController extends Controller
             ->get();
 
         return response()->json($papers);
+    }
+
+    public function download(Request $request, Review $review)
+    {
+        $user = $request->user();
+        $paper = $review->paper;
+        $canDownload = false;
+
+        if ($user) {
+            if ($user->isAdmin() || $paper->author_id === $user->id || $paper->assigned_reviewer_id === $user->id) {
+                $canDownload = true;
+            }
+        }
+
+        if (!$canDownload) {
+            return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
+        if (!$review->file_path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($review->file_path)) {
+            return response()->json(['message' => 'File not found.'], 404);
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($review->file_path, $review->file_name);
     }
 }
