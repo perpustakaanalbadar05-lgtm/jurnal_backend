@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\DiscussionController;
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
@@ -61,6 +62,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Assign reviewer (Admin only)
     Route::post('/papers/{paper}/assign-reviewer', [PaperController::class, 'assignReviewer'])
         ->middleware('role:admin,super_admin');
+
+    // Discussions
+    Route::get('/papers/{paper}/discussions', [DiscussionController::class, 'index']);
+    Route::post('/papers/{paper}/discussions', [DiscussionController::class, 'store']);
 
     // Reviews
     Route::get('/papers/{paper}/reviews', [ReviewController::class, 'index']);

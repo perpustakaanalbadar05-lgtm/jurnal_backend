@@ -50,4 +50,9 @@ class Paper extends Model
     {
         return $this->hasOne(Review::class)->latestOfMany();
     }
+
+    public function discussions()
+    {
+        return $this->hasMany(Discussion::class);
+    }
 }
