@@ -26,7 +26,7 @@ class ReviewController extends Controller
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
             return response()->json(
-                $paper->reviews()->with('reviewer')->select(['id', 'paper_id', 'reviewer_id', 'comment', 'decision', 'created_at'])->get()
+                $paper->reviews()->with('reviewer')->select(['id', 'paper_id', 'reviewer_id', 'comment', 'decision', 'file_path', 'file_name', 'word_file_path', 'word_file_name', 'created_at'])->get()
             );
         }
 
@@ -42,7 +42,8 @@ class ReviewController extends Controller
             'comment' => 'required|string',
             'private_comment' => 'nullable|string',
             'decision' => 'required|in:accept,minor_revision,major_revision,reject',
-            'file' => 'nullable|file|mimes:pdf,doc,docx|max:20480',
+            'file' => 'nullable|file|mimes:pdf|max:20480',
+            'word_file' => 'nullable|file|mimes:doc,docx|max:20480',
         ]);
 
         $paper = Paper::findOrFail($request->paper_id);
@@ -61,6 +62,14 @@ class ReviewController extends Controller
             $filePath = $file->store('reviews', 'local');
         }
 
+        $wordFilePath = null;
+        $wordFileName = null;
+        if ($request->hasFile('word_file')) {
+            $wordFile = $request->file('word_file');
+            $wordFileName = $wordFile->getClientOriginalName();
+            $wordFilePath = $wordFile->store('reviews/word', 'local');
+        }
+
         $review = Review::create([
             'paper_id' => $request->paper_id,
             'reviewer_id' => $user->id,
@@ -70,6 +79,8 @@ class ReviewController extends Controller
             'status' => 'completed',
             'file_path' => $filePath,
             'file_name' => $fileName,
+            'word_file_path' => $wordFilePath,
+            'word_file_name' => $wordFileName,
         ]);
 
         // Auto-update paper status based on decision
@@ -147,5 +158,28 @@ class ReviewController extends Controller
         }
 
         return \Illuminate\Support\Facades\Storage::disk('local')->download($review->file_path, $review->file_name);
+    }
+
+    public function downloadWord(Request $request, Review $review)
+    {
+        $user = $request->user();
+        $paper = $review->paper;
+        $canDownload = false;
+
+        if ($user) {
+            if ($user->isAdmin() || $paper->author_id === $user->id || $paper->assigned_reviewer_id === $user->id) {
+                $canDownload = true;
+            }
+        }
+
+        if (!$canDownload) {
+            return response()->json(['message' => 'Forbidden.'], 403);
+        }
+
+        if (!$review->word_file_path || !\Illuminate\Support\Facades\Storage::disk('local')->exists($review->word_file_path)) {
+            return response()->json(['message' => 'Word file not found.'], 404);
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('local')->download($review->word_file_path, $review->word_file_name);
     }
 }
