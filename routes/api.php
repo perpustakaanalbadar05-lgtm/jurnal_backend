@@ -72,6 +72,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
         ->middleware('role:reviewer,admin,super_admin');
     Route::get('/my-review-queue', [ReviewController::class, 'myQueue'])
         ->middleware('role:reviewer');
+    Route::get('/my-review-history', [ReviewController::class, 'myHistory'])
+        ->middleware('role:reviewer');
 
     // User Management (Admin only)
     Route::middleware('role:admin,super_admin')->group(function () {

@@ -182,4 +182,18 @@ class ReviewController extends Controller
 
         return \Illuminate\Support\Facades\Storage::disk('local')->download($review->word_file_path, $review->word_file_name);
     }
+
+    public function myHistory(Request $request)
+    {
+        $papers = Paper::with(['author', 'coAuthors', 'reviews' => function($query) use ($request) {
+            $query->where('reviewer_id', $request->user()->id)->with('reviewer');
+        }])
+            ->whereHas('reviews', function($query) use ($request) {
+                $query->where('reviewer_id', $request->user()->id);
+            })
+            ->latest()
+            ->get();
+
+        return response()->json($papers);
+    }
 }
