@@ -16,13 +16,13 @@ class ReviewController extends Controller
         $user = $request->user();
 
         // Reviewers can only see reviews for their assigned papers
-        if ($user->isReviewer() && $paper->assigned_reviewer_id !== $user->id) {
+        if ($user->isReviewer() && $paper->assigned_reviewer_id != $user->id) {
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
         // Authors can only see public comments on their own papers
         if ($user->isAuthor()) {
-            if ($paper->author_id !== $user->id) {
+            if ($paper->author_id != $user->id) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
             return response()->json(
@@ -50,7 +50,7 @@ class ReviewController extends Controller
         $user = $request->user();
 
         // Only assigned reviewer can review
-        if ($user->isReviewer() && $paper->assigned_reviewer_id !== $user->id) {
+        if ($user->isReviewer() && $paper->assigned_reviewer_id != $user->id) {
             return response()->json(['message' => 'You are not assigned to review this paper.'], 403);
         }
 
@@ -144,7 +144,7 @@ class ReviewController extends Controller
         $canDownload = false;
 
         if ($user) {
-            if ($user->isAdmin() || $paper->author_id === $user->id || $paper->assigned_reviewer_id === $user->id) {
+            if ($user->isAdmin() || $paper->author_id == $user->id || $paper->assigned_reviewer_id == $user->id) {
                 $canDownload = true;
             }
         }
@@ -167,7 +167,7 @@ class ReviewController extends Controller
         $canDownload = false;
 
         if ($user) {
-            if ($user->isAdmin() || $paper->author_id === $user->id || $paper->assigned_reviewer_id === $user->id) {
+            if ($user->isAdmin() || $paper->author_id == $user->id || $paper->assigned_reviewer_id == $user->id) {
                 $canDownload = true;
             }
         }

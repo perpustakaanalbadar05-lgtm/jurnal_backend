@@ -161,7 +161,7 @@ class PaperController extends Controller
 
         // Only author can update pending/revision papers
         if ($user->isAuthor()) {
-            if ($paper->author_id !== $user->id) {
+            if ($paper->author_id != $user->id) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
             if (!in_array($paper->status, ['pending', 'revision'])) {
@@ -292,7 +292,7 @@ class PaperController extends Controller
         if ($paper->status === 'published') {
             $canDownload = true; // Public can download published papers
         } elseif ($user) {
-            if ($user->isAdmin() || $paper->author_id === $user->id || $paper->assigned_reviewer_id === $user->id) {
+            if ($user->isAdmin() || $paper->author_id == $user->id || $paper->assigned_reviewer_id == $user->id) {
                 $canDownload = true;
             }
         }
@@ -317,7 +317,7 @@ class PaperController extends Controller
         if ($paper->status === 'published') {
             $canDownload = true; // Public can download published papers
         } elseif ($user) {
-            if ($user->isAdmin() || $paper->author_id === $user->id || $paper->assigned_reviewer_id === $user->id) {
+            if ($user->isAdmin() || $paper->author_id == $user->id || $paper->assigned_reviewer_id == $user->id) {
                 $canDownload = true;
             }
         }

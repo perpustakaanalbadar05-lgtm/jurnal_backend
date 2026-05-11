@@ -18,10 +18,10 @@ class DiscussionController extends Controller
 
         // Check if user has access to this paper's discussions
         if (!$user->isAdmin()) {
-            if ($user->isReviewer() && $paper->assigned_reviewer_id !== $user->id) {
+            if ($user->isReviewer() && $paper->assigned_reviewer_id != $user->id) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
-            if ($user->isAuthor() && $paper->author_id !== $user->id) {
+            if ($user->isAuthor() && $paper->author_id != $user->id) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
         }
@@ -40,10 +40,10 @@ class DiscussionController extends Controller
 
         // Check if user has access to this paper's discussions
         if (!$user->isAdmin()) {
-            if ($user->isReviewer() && $paper->assigned_reviewer_id !== $user->id) {
+            if ($user->isReviewer() && $paper->assigned_reviewer_id != $user->id) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
-            if ($user->isAuthor() && $paper->author_id !== $user->id) {
+            if ($user->isAuthor() && $paper->author_id != $user->id) {
                 return response()->json(['message' => 'Forbidden.'], 403);
             }
         }
