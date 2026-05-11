@@ -38,8 +38,11 @@ class DashboardController extends Controller
             ->pluck('count', 'status');
 
         // Submissions per month (last 6 months)
+        $driver = DB::getDriverName();
+        $dateFormat = $driver === 'sqlite' ? "strftime('%Y-%m', created_at)" : "DATE_FORMAT(created_at, '%Y-%m')";
+        
         $submissionTrend = Paper::select(
-                DB::raw("strftime('%Y-%m', created_at) as month"),
+                DB::raw("{$dateFormat} as month"),
                 DB::raw('count(*) as count')
             )
             ->where('created_at', '>=', now()->subMonths(6))
