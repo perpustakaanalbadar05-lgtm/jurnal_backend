@@ -10,10 +10,12 @@ use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\DiscussionController;
 
-// Public routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
-Route::post('/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
+// Public routes (Rate Limited)
+Route::middleware('throttle:5,1')->group(function () {
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/forgot-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'forgotPassword']);
+    Route::post('/reset-password', [\App\Http\Controllers\Api\PasswordResetController::class, 'resetPassword']);
+});
 
 // Public papers listing (published only)
 Route::get('/publications', [PaperController::class, 'publicIndex']);
@@ -24,8 +26,8 @@ Route::get('/publications/{paper}/download-word', [PaperController::class, 'down
 // Public Settings Route
 Route::get('/settings', [\App\Http\Controllers\Api\SystemController::class, 'getSettings']);
 
-// Protected routes
-Route::middleware(['auth:sanctum'])->group(function () {
+// Protected routes with global 60 req/min rate limit
+Route::middleware(['auth:sanctum', 'throttle:60,1'])->group(function () {
 
     // Auth
     Route::post('/logout', [AuthController::class, 'logout']);
