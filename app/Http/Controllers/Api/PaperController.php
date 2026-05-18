@@ -79,6 +79,7 @@ class PaperController extends Controller
             'abstract' => 'required|string',
             'keywords' => 'nullable|string|max:500',
             'category' => 'nullable|string|max:255',
+            'budget' => 'nullable|string|max:255',
             'file' => 'nullable|file|mimes:pdf|max:20480', // 20MB max
             'word_file' => 'nullable|file|mimes:doc,docx|max:20480', // 20MB max
             'co_authors' => 'nullable|array',
@@ -108,6 +109,7 @@ class PaperController extends Controller
             'abstract' => $request->abstract,
             'category' => $request->category,
             'keywords' => $request->keywords,
+            'budget' => $request->budget,
             'file_path' => $filePath,
             'file_name' => $fileName,
             'word_file_path' => $wordFilePath,
@@ -174,6 +176,7 @@ class PaperController extends Controller
             'abstract' => 'sometimes|string',
             'category' => 'nullable|string|max:255',
             'keywords' => 'nullable|string|max:500',
+            'budget' => 'nullable|string|max:255',
             'file' => 'nullable|file|mimes:pdf|max:20480',
             'word_file' => 'nullable|file|mimes:doc,docx|max:20480',
             'status' => 'sometimes|in:pending,under_review,accepted,revision,rejected,published',
@@ -200,7 +203,7 @@ class PaperController extends Controller
             $paper->word_file_path = $wordFile->store('papers/word', 'local');
         }
 
-        $paper->fill($request->only(['title', 'abstract', 'category', 'keywords', 'status', 'assigned_reviewer_id', 'admin_notes']));
+        $paper->fill($request->only(['title', 'abstract', 'category', 'keywords', 'budget', 'status', 'assigned_reviewer_id', 'admin_notes']));
         $paper->save();
 
         ActivityLog::log('paper_updated', "Paper '{$paper->title}' updated to status: {$paper->status}", $paper);
@@ -208,11 +211,11 @@ class PaperController extends Controller
         // Notify author when status changes
         if ($request->has('status') && $paper->wasChanged('status')) {
             $statusMessages = [
-                'accepted'     => '🎉 Paper Anda telah Diterima! Selamat.',
-                'rejected'     => '❌ Paper Anda Ditolak. Silakan lihat catatan dari reviewer.',
-                'revision'     => '📝 Paper Anda Perlu Direvisi. Mohon lakukan perbaikan.',
-                'under_review' => '🔍 Paper Anda sedang Direview oleh reviewer.',
-                'published'    => '🌐 Paper Anda telah Dipublikasikan!',
+                'accepted'     => 'Paper Anda telah Diterima! Selamat.',
+                'rejected'     => 'Paper Anda Ditolak. Silakan lihat catatan dari reviewer.',
+                'revision'     => 'Paper Anda Perlu Direvisi. Mohon lakukan perbaikan.',
+                'under_review' => 'Paper Anda sedang Direview oleh reviewer.',
+                'published'    => 'Paper Anda telah Dipublikasikan!',
             ];
             $msg = $statusMessages[$paper->status] ?? "Status paper Anda berubah menjadi: {$paper->status}.";
             Notification::notify(
@@ -346,7 +349,7 @@ class PaperController extends Controller
             "Expires"             => "0"
         ];
 
-        $columns = ['ID', 'Judul', 'Kategori', 'Status', 'Author', 'Institusi', 'Reviewer', 'Tanggal Submit'];
+        $columns = ['ID', 'Judul', 'Kategori', 'Anggaran', 'Status', 'Author', 'Institusi', 'Reviewer', 'Tanggal Submit'];
 
         $callback = function() use($papers, $columns) {
             $file = fopen('php://output', 'w');
@@ -357,6 +360,7 @@ class PaperController extends Controller
                     $paper->id,
                     $paper->title,
                     $paper->category ?? '-',
+                    $paper->budget ?? '-',
                     $paper->status,
                     $paper->author ? $paper->author->name : '-',
                     $paper->author ? $paper->author->institution : '-',

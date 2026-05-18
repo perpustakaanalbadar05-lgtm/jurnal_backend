@@ -97,10 +97,10 @@ class ReviewController extends Controller
 
         // Notify the author of the review
         $decisionMessages = [
-            'accept'         => '🎉 Paper Anda mendapat keputusan: Diterima.',
-            'minor_revision' => '📝 Paper Anda memerlukan revisi minor.',
-            'major_revision' => '📝 Paper Anda memerlukan revisi mayor.',
-            'reject'         => '❌ Paper Anda mendapat keputusan: Ditolak.',
+            'accept'         => 'Paper Anda mendapat keputusan: Diterima.',
+            'minor_revision' => 'Paper Anda memerlukan revisi minor.',
+            'major_revision' => 'Paper Anda memerlukan revisi mayor.',
+            'reject'         => 'Paper Anda mendapat keputusan: Ditolak.',
         ];
         Notification::notify(
             $paper->author_id,

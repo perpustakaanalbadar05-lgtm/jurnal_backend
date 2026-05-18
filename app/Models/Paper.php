@@ -10,7 +10,7 @@ class Paper extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'abstract', 'category', 'keywords', 'file_path', 'file_name',
+        'title', 'abstract', 'category', 'keywords', 'budget', 'file_path', 'file_name',
         'word_file_path', 'word_file_name',
         'author_id', 'assigned_reviewer_id', 'status', 'version', 'admin_notes',
     ];

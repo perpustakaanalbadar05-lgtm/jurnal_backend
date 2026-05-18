@@ -18,7 +18,7 @@ class SystemController extends Controller
             'description' => 'Sistem Manajemen Publikasi Akademik Resmi',
             'contact_email' => 'admin@kampus.ac.id',
             'address' => 'Jl. Pendidikan No. 1, Kota Akademik',
-            'categories' => ['Computer Science', 'Information Systems', 'Software Engineering', 'Artificial Intelligence', 'Networking', 'Others'],
+            'categories' => ['Penelitian', 'Pengabdian Kepada Masyarakat'],
         ];
 
         if (!Storage::disk('local')->exists($this->settingsFile)) {
